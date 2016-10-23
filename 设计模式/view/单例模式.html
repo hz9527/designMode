@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			//由构造函数生成闭包
+			function getSingle(fn){
+				var result;
+				return function(){
+					console.log(this);
+					return result||(result=fn.apply(this,arguments))
+				}
+			}
+			function a(name){
+				this.name=name;
+				a.prototype.sayname=function(){
+					console.log(this.name)
+				}
+				return this
+			}
+			function f(name){
+				this.name=name;
+				f.prototype.sayname=function(){
+					console.log(this.name)
+				}
+				//console.log(this,1);
+				return this
+			}
+			//var b=getSingle(a);
+			var F=getSingle(f);
+//			var c=new b('hz');
+//			var d=new b('hh');
+			var e=F('hh');
+			//e.name='hh';
+			var g=new F('hz');
+			//g.name='hz'
+			g.sayname()
+			console.log(e,g)
+		</script>
+		
+	</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			//发布订阅功能组件
+			var eventFeature={
+				events:[],
+				addEvent:function(fn){
+					this.events.push(fn);
+				},
+				trigger:function(){
+					console.log('执行默认行为');
+					for(var i=0;i<this.events.length;i++){
+						this.events[i].apply(this,arguments);
+					}
+				}
+			}
+			//为任意对象添加发布订阅功能
+			function installEvent(obj){
+				for(var key in eventFeature){
+					if(key=='events'){
+						obj[key]=[];
+					}else{
+						obj[key]=eventFeature[key];
+					}
+				}
+			}
+			//test
+			var obj={},obj2={};
+			installEvent(obj);
+			installEvent(obj2);
+			obj.addEvent(function(){
+				console.log(1);
+			});
+			obj.addEvent(function(){
+				console.log(arguments);
+			});
+			obj.trigger('hhhhh');
+			obj2.trigger('zzzzz');
+			
+			//先发布再订阅的功能
+			
+			
+			
+		</script>
+		
+		
+		
+		
+	</body>
+</html>

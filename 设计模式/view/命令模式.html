@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		#ball{
+			width:100px;
+			height:100px;
+			border-radius: 50%;
+			background:#0ff;
+			position:absolute;
+			top:200px;
+		}
+	</style>
+	<body>
+		<button id='btn1'>moveBall</button>
+		<button id='btn2'>undo</button>
+		<div id='ball' style='left:10px'></div>
+		<script>
+			//命令与撤销命令
+			function setCommand(btn,command){
+				btn.onclick=function(){
+					command.execute();
+				}
+			}
+			function undoCommand(btn,command){
+				btn.onclick=function(){
+					command.undo();
+				}
+			}
+			var btn1=document.getElementById('btn1');
+			var btn2=document.getElementById('btn2');
+			var ball=document.getElementById('ball');
+			function MoveBall(ball){
+				this.ball=ball;
+				this.oldPos=[];
+				this.commandList=[];
+				this.lastTime=null;
+				this.moveBall=function(){
+					var that=this;
+					this.oldPos.push(parseFloat(this.ball.style.left));
+					var timer=setInterval(function(){
+						var left=parseFloat(that.ball.style.left);
+						left+=10;
+						if(left-that.oldPos[that.oldPos.length-1]>100){
+							clearTimeout(timer);
+							timer=null;
+							//将命令队列中第一个函数踢掉，然后执行最前面的
+							that.commandList.shift();
+							if(that.commandList.length>0){
+								that.commandList[0].call(that);
+								console.log(that.commandList.length)
+							}
+						}else{
+							that.ball.style.left=left+'px';	
+						}
+					},300)
+				}
+				this.undoBall=function(){
+					var that=this;
+					if(this.oldPos.length>0){
+						var timer=setInterval(function(){
+						var left=parseFloat(that.ball.style.left);
+						left-=10;
+						if(left<=that.oldPos[that.oldPos.length-1]){
+							clearTimeout(timer);
+							timer=null;
+							that.oldPos.pop();
+						}else{
+							that.ball.style.left=left+'px';	
+						}
+					},30)
+					}
+					
+				}
+				MoveBall.prototype.execute=function(){
+					this.lastTime=new Date().getTime();
+					this.commandList.push(this.moveBall);
+					this.commandList.length==1&&this.moveBall();
+				}
+				MoveBall.prototype.undo=function(){
+					this.undoBall();
+				}
+			}
+			var move=new MoveBall(ball);
+			//将原程序改成命令队列及撤销队列
+			//将执行命令交给命令队列来完成，若命令队列中还存在函数则不执行，若执行完则将当前执行出栈，并
+			//为移动小球的函数添加订阅的能力
+			setCommand(btn1,move);
+			undoCommand(btn2,move)
+		</script>
+	</body>
+</html>

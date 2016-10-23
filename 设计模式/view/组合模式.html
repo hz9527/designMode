@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			//组合模式原型对象,需要执行的命令都是具有execute属性且属性值为function类型
+			function MacroCommand(){
+				this.commandList=[];
+				MacroCommand.prototype.addCommand=function(fn){
+					this.commandList.push(fn);
+				}
+				MacroCommand.prototype.execute=function(){
+					for(var i=0;i<this.commandList.length;i++){
+						this.commandList[i].execute(arguments[i]);
+					}
+				}
+			}
+			var mainMacro=new MacroCommand();
+			mainMacro.addCommand({execute:function(){console.log('main1')}});
+			mainMacro.addCommand({execute:function(){console.log('main2')}});
+			var childMacro=new MacroCommand();
+			childMacro.addCommand({execute:function(){console.log('child1')}});
+			childMacro.addCommand({execute:function(){console.log('child2')}});
+			mainMacro.addCommand(childMacro);
+			mainMacro.execute()
+		</script>
+	</body>
+</html>

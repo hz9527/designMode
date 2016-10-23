@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			//简单的责任链模式，每一步操作都实例化一次责任链对象并进行传递
+			//例如一个电商业务，交了定金500的支付则获得100块优惠券且有优先购买权；200获得50块；未付定金则库存不足
+//			function Chain(fn){
+//				this.fn=fn;
+//				this.successor=null;
+//				Chain.prototype.setSuccessor=function(successor){
+//					this.successor=successor;
+//				}
+//				Chain.prototype.passRequest=function(){
+//					var ret=this.fn.apply(this,arguments);
+//					if(ret===true){
+//						this.successor&&this.successor.passRequest.apply(this.successor,arguments);
+//					}
+//				}
+//			}
+//			function order500(pay,paid){
+//				if(pay==500&&paid){
+//					console.log('支付定金500，购买成功，获得优惠券100');
+//				}else{
+//					return true;
+//				}
+//			}
+//			function order200(pay,paid){
+//				if(pay==200&&paid){
+//					console.log('支付定金200，购买成功，获得优惠券50');
+//				}else{
+//					return true;
+//				}
+//			}
+//			function order(pay,paid){
+//				if(pay>0){
+//					console.log('未支付定金，普通购买用户，不享受优惠');
+//				}else{
+//					console.log('臭屌丝，不卖给你')
+//				}
+//			}
+//			var Order500=new Chain(order500);
+//			var Order200=new Chain(order200);
+//			var Order=new Chain(order);
+//			Order500.setSuccessor(Order200);
+//			Order200.setSuccessor(Order);
+//			console.log(Order500)
+//			Order500.passRequest(500,true);
+//			Order500.passRequest(500,false);
+//			Order500.passRequest(0,false);
+//			Order500.passRequest(200,false);
+//			Order500.passRequest(200,true);
+
+			//将责任链可能调用的函数放在数组中
+//			function Chain(){
+//				this.chainFn=[];
+//				//按传递顺序将函数放在链中
+//				Chain.prototype.addFn=function(fn){
+//					this.chainFn.push(fn);
+//				}
+//				Chain.prototype.passRequest=function(){
+//					for(var i=0;i<this.chainFn.length;i++){
+//						var ret=this.chainFn[i].apply(this,arguments);
+//						if(!ret){
+//							break;
+//						}
+//					}
+//				}
+//			}
+//			function order500(pay,paid){
+//				if(pay==500&&paid){
+//					console.log('支付定金500，购买成功，获得优惠券100');
+//				}else{
+//					return true;
+//				}
+//			}
+//			function order200(pay,paid){
+//				if(pay==200&&paid){
+//					console.log('支付定金200，购买成功，获得优惠券100');
+//				}else{
+//					return true;
+//				}
+//			}
+//			function order(pay,paid){
+//				if(pay>0){
+//					console.log('未支付定金，普通购买用户，不享受优惠');
+//				}else{
+//					console.log('臭屌丝，不卖给你')
+//				}
+//			}
+//			var chainPay=new Chain();
+//			chainPay.addFn(order500);
+//			chainPay.addFn(order200);
+//			chainPay.addFn(order);
+//			chainPay.passRequest(500,false);
+//			chainPay.passRequest(500,true);
+//			chainPay.passRequest(0,false);
+//			chainPay.passRequest(200,false);
+//			chainPay.passRequest(200,true);
+
+			//异步的责任链模式
+//			function Chain(fn){
+//				this.fn=fn;
+//				this.successor=null;
+//				Chain.prototype.setSuccessor=function(successor){
+//					this.successor=successor;
+//				}
+//				Chain.prototype.passRequest=function(){
+//					this.fn.apply(this,arguments);
+//				}
+//				Chain.prototype.next=function(){
+//					this.successor.passRequest.apply(this.successor,arguments);
+//				}
+//			}
+//			function order500(pay,paid){
+//				var that=this;
+//				setTimeout(function(){
+//					if(pay==500&&paid){
+//						console.log('支付定金500，购买成功，获得优惠券100');
+//					}else{
+//						that.next.call(that,pay,paid);
+//					}
+//				},500)
+//			}
+//			function order200(pay,paid){
+//				var that=this;
+//				setTimeout(function(){
+//					if(pay==200&&paid){
+//						console.log('支付定金200，购买成功，获得优惠券100');
+//					}else{
+//						that.next.call(that,pay,paid);
+//					}
+//				},500)
+//			}
+//			function order(pay,paid){
+//				var that=this;
+//				setTimeout(function(){
+//					if(pay>0){
+//						console.log('未支付定金，普通购买用户，不享受优惠');
+//					}else{
+//						console.log('臭屌丝，不卖给你')
+//					}
+//				},500)
+//			}
+//			var Order500=new Chain(order500);
+//			var Order200=new Chain(order200);
+//			var Order=new Chain(order);
+//			Order500.setSuccessor(Order200);
+//			Order200.setSuccessor(Order);
+//			Order500.passRequest(500,false);
+//			Order500.passRequest(500,true);
+//			Order500.passRequest(200,false);
+//			Order500.passRequest(0,false);
+//			Order500.passRequest(200,true);
+			
+			//利用aop实现责任链
+			//先回顾after方式
+			Function.prototype.after=function(fn){
+				var that=this;
+				return function(){
+					var ret=that.apply(this,arguments);
+					fn.apply(this,arguments);
+					return ret;
+				}
+			}
+			Function.prototype.before=function(fn){
+				var that=this;
+				return function(){
+					
+					fn.apply(this,arguments);
+					return that.apply(this,arguments);
+				}
+			}
+			function fn1(a){
+				console.log(a);
+			}
+			fn1=fn1.after(function(){console.log(1)}).after(function(a){console.log(a+2)}).before(function(a){console.log(a-1)}).after(function(a){console.log(a+3)})
+			.before(function(a){console.log(a-2)});
+			fn1(0);
+			Function.prototype.successor=function(fn){
+				var that=this;
+				return function(){
+					var ret=that.apply(this,arguments);
+					if(ret){
+						fn.apply(this,arguments);
+					}
+					return ret
+				}
+			}
+			function order500(pay,paid){
+				if(pay==500&&paid){
+					console.log('支付定金500，购买成功，获得优惠券100');
+				}else{
+					return true;
+				}
+			}
+			function order200(pay,paid){
+				if(pay==200&&paid){
+					console.log('支付定金200，购买成功，获得优惠券100');
+				}else{
+					return true;
+				}
+			}
+			function order(pay,paid){
+				if(pay>0){
+					console.log('未支付定金，普通购买用户，不享受优惠');
+				}else{
+					console.log('臭屌丝，不卖给你')
+				}
+			}
+			var order=order500.successor(order200).successor(order);
+			order(500,false);
+			order(500,true);
+			order(200,true);
+			order(0,false);
+			order(200,false);
+		</script>
+	</body>
+</html>

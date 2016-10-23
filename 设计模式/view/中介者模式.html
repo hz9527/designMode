@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			//中介者模式案例
+			//现在有一个对抗类游戏，有不同队伍，队员可以随时上线和离线（死亡），调换队伍，需要判断输赢
+			//为保证对象间的依赖关系变得松散，新增玩家使用工厂函数来实现
+			function Player(name,team){
+				this.name=name;
+				this.team=team;
+				this.status='live'
+				Player.prototype.die=function(){
+					this.status='die';
+					var argument=Array.prototype.slice(1)
+					mediator[arguments[0]].execute(this,argument);
+				}
+				Player.prototype.changeTeam=function(newTeam){
+					this.team=newTeam;
+					var argument=Array.prototype.slice(1)
+					mediator[arguments[0]].execute(this,argument);
+				}
+			}
+		</script>
+	</body>
+</html>

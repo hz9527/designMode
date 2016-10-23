@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		//make car
+		function CreateCar(type,model,createTime){
+			this.type=type;
+			this.model=model;
+			this.createTime=createTime;
+			CreateCar.prototype.getType=function(){
+				console.log(this.type);
+			}
+		}
+		var carFactory=(function(){
+			var carfactory={};
+			return function(type,model,createTime){
+				if(!carfactory[type+','+model+','+createTime]){
+					carfactory[type+','+model+','+createTime]=new CreateCar(type,model,createTime)
+				}
+			}
+		})()
+		var carManager=(function(){
+			var cars={}
+			return{
+				
+			}
+		})()
+	</body>
+</html>
